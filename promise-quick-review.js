@@ -128,13 +128,18 @@ new Promise(function(resolve, reject) {
 
 //6) Promise.all 함수 사용
 
-Promise.all([
+/*Promise.all([
     new Promise(resolve => setTimeout(() => resolve(1), 3000)), // 1
     new Promise(resolve => setTimeout(() => resolve(2), 2000)), // 2
     new Promise(resolve => setTimeout(() => {
         // 어떤 Promise 내부에서든, 실패하면 catch 블록으로 이동
         // throw new Error("error 3");
-        resolve(3);
+        try{
+            throw new Error("error 3");
+            resolve(3);
+        }catch(e){
+            reject(e);
+        }
     }, 1000)) // 3
 ])
     .then(result => {
@@ -145,4 +150,36 @@ Promise.all([
     .catch(e => {
         // 프라미스 중 하나라도 실패하면, 모두 실패한 것으로 처리되고 catch 블록으로 이동
         console.log(e);
+    });*/
+
+
+//모듈 불러오기 (js 코드 내부에서 최상단에 삽입)
+// npm install node-fetch
+const fetch = require('node-fetch');
+// npm install axios
+const axios = require('axios');
+
+/*
+//fetch 모듈 사용
+// fetch
+fetch('https://jsonplaceholder.typicode.com/users/1')
+    // 원격 서버가 응답하면 then 핸들러가 실행됨
+    .then(function(response) {
+        // json 메서드는 응답 텍스트 전체를 자바스크립트 객체로 파싱(변환)하는 작업을 진행하는 프라미스를 반환 => 비동기
+        return response.json();
+    })
+    .then(function(json) {
+        // 객체의 내용을 JSON.stringify 함수를 통해 문자열로 변환하여 출력
+        console.log(JSON.stringify(json));
+    });*/
+
+
+//axios 모듈 사용
+// axios
+//get: read
+axios.get('https://jsonplaceholder.typicode.com/users/1')
+    //Promise 객체 리턴
+    .then(res => {
+        // axios 내부적으로 객체로의 역직렬화 작업을 수행하므로 그냥 객체처럼 바로 사용 가능
+        console.log(res.data);
     });
