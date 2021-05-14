@@ -49,20 +49,100 @@ promise.then(
     error => console.log(error)
 );*/
 
+//4) 프라미스 체이닝
 
+/*
 new Promise(function(resolve, reject) {
     setTimeout(() => resolve(1), 1000);
 }).then(function(result) {  //Promise 객체니까 then 바로 할 수 있음
     // resolve 호출의 결과로 전달된 값(1)이 result로 넘어옴
     console.log(result); // 1
     // 여기서 2가 반환되지만, 내부적으로 반환값을 resolve 함수로 전달하는 Promise 객체를 생성하여 반환하므로 결과적으로 연쇄적인 then 메서드 호출이 가능함
-    //return result * 2;
+    return result * 2;
     // 즉, 내부적으로는 아래와 같은 코드를 실행
-    return new Promise(resolve => resolve(result * 2));
+    //return new Promise(resolve => resolve(result * 2));
 }).then(function(result) {
     console.log(result); // 2
     return result * 2;
 }).then(function(result) {
     console.log(result); // 4
     return result * 2;
-});
+});*/
+
+//프라미스 체이닝 (with 연속 비동기 작업)
+/*new Promise(function(resolve, reject) {
+    setTimeout(() => resolve(1), 1000);
+}).then(function(result) {
+    console.log(result)
+    // 연속적인 비동기 작업 진행
+    return new Promise(resolve => {
+        setTimeout(() => {
+            resolve(result * 2)
+        }, 1000)
+    });
+    // 콜백 지옥 문제 없이 then으로 결과 받아내기
+}).then(function(result) {
+    console.log(result)
+    // 또 다른 연속적인 비동기 작업 진행
+    return new Promise(resolve => {
+        setTimeout(() => {
+            resolve(result * 2)
+        }, 1000)
+    });
+}).then(function(result) {
+    console.log(result)
+});*/
+
+
+//5) 프라미스 체이닝 + 예외 처리
+// 작업 중간 예외 발생할 경우 catch 블록으로 이동
+/*
+new Promise(function(resolve, reject) {
+    setTimeout(() => {
+        // 초기 작업 진행
+        try{
+            throw new Error("error1")
+            reject(1);
+        }catch(e){
+            reject(e);
+        }
+    }, 1000); // (*)
+})
+    .then(function(result) {
+        // 중간 작업 진행
+        throw new Error("error 2");
+        console.log(result);
+        return result * 2;
+    })
+    .then(function(result) {
+        // 마지막 최종 작업 진행
+        // throw new Error("error 3");
+        console.log(result);
+    })
+    // Promise 생성시 전달한 함수 및 체이닝 함수 내부에서 발생한 에러는 모두 여기서 처리 가능
+    .catch(function(e) {
+        console.log('catch~!');
+        console.log(e);
+    });*/
+
+
+//6) Promise.all 함수 사용
+
+Promise.all([
+    new Promise(resolve => setTimeout(() => resolve(1), 3000)), // 1
+    new Promise(resolve => setTimeout(() => resolve(2), 2000)), // 2
+    new Promise(resolve => setTimeout(() => {
+        // 어떤 Promise 내부에서든, 실패하면 catch 블록으로 이동
+        // throw new Error("error 3");
+        resolve(3);
+    }, 1000)) // 3
+])
+    .then(result => {
+        // 프라미스 전체가 성공적으로 처리되면 배열([1, 2, 3])이 반환됨,
+        // (즉, 각 프라미스의 결과값이 배열을 구성하는 요소가 됨)
+        console.log(result);
+    })
+    .catch(e => {
+        // 프라미스 중 하나라도 실패하면, 모두 실패한 것으로 처리되고 catch 블록으로 이동
+        console.log(e);
+    });
